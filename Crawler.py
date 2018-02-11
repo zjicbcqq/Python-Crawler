@@ -301,7 +301,6 @@ class Crawler(CrawlerBase):
                     flg = True
                     self.__parse_page(self.__page_info_list.pop(0)['url'])
 
-
     def gen_all_page(self, *args):
         """
         自定义页面链接生成规则，加入列表

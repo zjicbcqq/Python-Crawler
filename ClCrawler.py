@@ -103,15 +103,6 @@ class ClCrawler(Crawler):
         url = child['src']
         index_s = '%03d' % index
 
-        '''
-        if info['tag'] == '[寫真]':
-            return None
-        elif info['tag'] == '[動漫]':
-            return None
-        elif info['tag'] == '[其他]':
-            return None
-        # '''
-
         new_info = {'tag': info['tag'], 'url': url, 'name': info['name'], 'date': info['date'], 'index': index_s}
 
         return new_info
