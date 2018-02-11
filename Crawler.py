@@ -38,7 +38,7 @@ class Crawler(CrawlerBase):
 
     def __init__(self):
 
-        CrawlerBase.__init__(self)
+        super().__init__()
 
         print('Clawler 构造函数执行')
         # self.save_path = path

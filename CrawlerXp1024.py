@@ -13,7 +13,11 @@ cookiesold = {
     '3nvN_7b26_sid': 'a92CL9', '3nvN_7b26_ulastactivity': '3f446m9k%2F3JqghhOTMXQfJ%2BJ8arjpUFb3F7DHMJ69x4MOPx5IyGa'}
 
 
-class ClCrawler(Crawler):
+class CrawlerXp1024(Crawler):
+    def __init__(self):
+        super().__init__()
+        return
+
     def on_gen_all_page(self, *args):
         """
         自定义页面链接生成规则，加入列表
@@ -41,7 +45,7 @@ class ClCrawler(Crawler):
         :rtype:
         :return:
         """
-        childs = soup.find_all('tr', class_="tr3 t_one tac")
+        childs = soup.find_all('tr', class_="tr3 t_one")
         return childs
 
     def on_parse_page_child(self, child):
@@ -54,29 +58,27 @@ class ClCrawler(Crawler):
         :return:
         """
         td = child.td
-        td = td.next_sibling.next_sibling
-        string = td.get_text()
-        i = string.find('[')
-        tag = string[i:i + 4]
-        # print('帖子标签:[%s]' % tag)
-        if tag == '[寫真]':
+
+        td = child.td
+        td = td.next_sibling
+        if td.h3 is None:
             return None
-        elif tag == '[動漫]':
-            return None
-        elif tag == '[其他]':
-            return None
+        href = str(self.url_host) + 'pw/' + td.h3.a['href']
 
-        href = str(self.url_host) + td.a['href']
-        # print('帖子链接:[%s]' % href)
+        name = td.h3.a.string[8:]
 
-        name = td.a.string
-        # print('帖子名称:[%s]' % name)
+        td = td.next_sibling
+        td = td.next_sibling
+        td = td.next_sibling
+        td = td.next_sibling
+        td = td.next_sibling
+        td = td.next_sibling
+        date_time = td.string
+        date = date_time[1:11]
 
-        td = td.next_sibling.next_sibling
-        date = td.div.string
-        # print('帖子日期:[%s]' % date)
+        # print(href, name, date)
 
-        new_info = {'tag': tag, 'url': href, 'name': name, 'date': date}
+        new_info = {'url': href, 'name': name, 'date': date}
 
         return new_info
 
@@ -87,7 +89,7 @@ class ClCrawler(Crawler):
         :rtype:
         :return:
         """
-        childs = soup.find_all('input', type="image")
+        childs = soup.find_all('img', onload="if(this.width>'1024')this.width='1024';")
 
         return childs
 
@@ -103,7 +105,7 @@ class ClCrawler(Crawler):
         url = child['src']
         index_s = '%03d' % index
 
-        new_info = {'tag': info['tag'], 'url': url, 'name': info['name'], 'date': info['date'], 'index': index_s}
+        new_info = {'url': url, 'name': info['name'], 'date': info['date'], 'index': index_s}
 
         return new_info
 
@@ -121,17 +123,20 @@ class ClCrawler(Crawler):
         # 问号不能做文件名，需要替换
         name = name.replace('?', '9')
         # 按格式重组文件名
-        name = info['date'] + info['tag'] + info['name'] + '_' + info['index'] + '_' + name
+        name = info['date'] + '_' + info['name'] + '_' + info['index'] + '_' + name
+
+        # print("文件名[%s]" % name)
+        # return None
 
         # 返回 链接 和 文件名
         return {'url': url, 'name': name}
 
 
-c = ClCrawler()
+c = CrawlerXp1024()
 # c.cookies = cookiesold
-c.set_url('http://cl.wysa.pw/thread0806.php?fid=8&search=&page=4')
-c.save_path = 'img/1/'
-c.encoding = 'GBK'
+c.set_url('http://s2.lulujjs.net/pw/thread.php?fid=49&page=2')
+c.save_path = 'img/'
+# c.encoding = 'GBK'
 c.max_thread_num = 10
-c.gen_all_page(5, 100)
+c.gen_all_page(2, 50)
 c.deal_down_list()
