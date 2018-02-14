@@ -31,6 +31,10 @@ class Crawler(CrawlerBase):
     __post_info_list = []
     # 下载文件信息列表
     __download_info_list = []
+
+    def append_download_info_list(self, value):
+        self.__download_info_list.append(value)
+
     # 线程池
     __thread_pool = []
     # 帖子下载线程
@@ -193,9 +197,14 @@ class Crawler(CrawlerBase):
         :rtype:
         :return:
         """
+
         self.lock.acquire()
         info = self.__post_info_list.pop(0)
         self.lock.release()
+
+        if self.no_parse_post:
+            return
+
         r = requests.get(info['url'], cookies=self.cookies)
         r.encoding = self.encoding
         print("帖子链接:[%s]" % r.url)
@@ -233,20 +242,31 @@ class Crawler(CrawlerBase):
             os.makedirs(self.save_path)
         file_name = str(self.save_path) + rlt['name']
 
-        # '''
-        try:
-            req = requests.get(file_url)  # create HTTP response object
-            with open(file_name, 'wb') as f:
-                f.write(req.content)
-        except:
-            print('*** 下载失败 *** [%s] 文件名:' % file_url, file_name)
+        # 设置 http referer
+        if len(self.referer) > 0:
+            headers = {"Referer": self.referer}
         else:
-            print('下载成功 [%s] 文件名:' % file_url, file_name)
-        finally:
-            pass
-        # '''
+            headers = []
 
-        # time.sleep(0.2)
+        # '''
+        downok = False
+        for i in range(3):
+            try:
+                req = requests.get(file_url, headers=headers)  # create HTTP response object
+                with open(file_name, 'wb') as f:
+                    f.write(req.content)
+            except:
+                print('*** 下载失败 *** [%s] 文件名:' % file_url, file_name)
+            else:
+                downok = True
+                print('下载成功 [%s] 文件名:' % file_url, file_name)
+            finally:
+                pass
+            # '''
+
+            # time.sleep(0.2)
+            if downok is True:
+                break
 
         return True
 

@@ -1,5 +1,6 @@
 import re
 
+
 class CrawlerBase:
     def __init__(self):
         print('CrawlerBase 构造函数执行')
@@ -75,3 +76,25 @@ class CrawlerBase:
     @encoding.setter
     def encoding(self, value):
         self.__encoding = value
+
+    # HTTP Referer
+    __referer = []
+
+    @property
+    def referer(self):
+        return self.__referer
+
+    @referer.setter
+    def referer(self, value):
+        self.__referer = value
+
+    # 是否解析帖子（部分网站可从页面获取下载链接）
+    __no_parse_post = False
+
+    @property
+    def no_parse_post(self):
+        return self.__no_parse_post
+
+    @no_parse_post.setter
+    def no_parse_post(self, value):
+        self.__no_parse_post = value
